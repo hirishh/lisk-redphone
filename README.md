@@ -6,9 +6,9 @@ Lisk Red Phone is an utility for Lisk Delegates that makes real phone call when 
 
 - [Install Node.js](https://nodejs.org/download/).
 - Create a Twilio Account at [www.twilio.com](https://www.twilio.com/).
-- Create a `Phone Number` project
+- Create a `Phone Number` project (under Products section)
 - On the project dashboard, click on `Get a Number` and create a new Twilio Number
-- A **free Twilio account is enough**, you'll receive a call with a "demo" audio file.
+- A **trial Twilio account is enough**, you'll receive a call with a "demo" audio file.
 
 ### Set-up ###
 
@@ -25,7 +25,7 @@ This tools is monitoring `localhost`. It means **it must be deployed where the l
     "authToken": "<AUTH TOKEN>"
   },
   "call": {
-    "from": "<YOUR TWILLO NUMBER>",
+    "from": "<YOUR TWILIO NUMBER>",
     "to": "<YOUR MOBILE NUMBER WITH COUNTRY PREFIX (ex +1 123 345 67 89)>"
   },
   "checkFrequencyInMinutes": 1,
