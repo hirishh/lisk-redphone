@@ -1,0 +1,33 @@
+{
+  "name": "lisk-redline",
+  "version": "1.0.0",
+  "description": "Lisk Red Line is a monitoring tool for lisk forgers that call you when your node is red",
+  "main": "index.js",
+  "scripts": {
+    "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log,./public --copy-files",
+    "start": "npm run build && node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hirishh/lisk-redline.git"
+  },
+  "author": "hirish",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hirishh/lisk-redline/issues"
+  },
+  "homepage": "https://github.com/hirishh/lisk-redline#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "config": "^2.0.1",
+    "debug": "^4.0.1",
+    "repeat": "0.0.6",
+    "twilio": "^3.19.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^7.0.0-beta.3",
+    "babel-preset-es2015": "^7.0.0-beta.3",
+    "rimraf": "^2.6.2"
+  }
+}
