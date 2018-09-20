@@ -8,8 +8,11 @@ Lisk Red Phone is an utility for Lisk Delegates that makes real phone call when 
 - Create a Twilio Account at [www.twilio.com](https://www.twilio.com/).
 - Create a `Phone Number` project
 - On the project dashboard, click on `Get a Number` and create a new Twilio Number
+- A **free Twilio account is enough**, you'll receive a call with a "demo" audio file.
 
 ### Set-up ###
+
+This tools is monitoring `localhost`. It means **it must be deployed where the lisk node lives**.
 
 1. Clone this repository: `git clone https://github.com/hirishh/lisk-redphone.git`
 2. `cd lisk-redphone`
