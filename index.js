@@ -74,6 +74,6 @@ log.debug('Starting Repeater...');
 Repeat( function() {
   check();
 })
-.every(config.get('frequencyInMinutes'), 'min')
+.every(config.get('checkFrequencyInMinutes'), 'min')
 .start()
 .then(onSuccess, onFailure, onProgress);

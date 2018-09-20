@@ -7,7 +7,7 @@
     "from": "<YOUR TWILLO NUMBER>",
     "to": "<YOUR MOBILE NUMBER WITH COUNTRY PREFIX (ex +1 123 345 67 89)>"
   },
-  "frequencyInMinutes": 1,
+  "checkFrequencyInMinutes": 1,
   "cooldownInMinutes": 15,
   "isTestnet": false
 }
