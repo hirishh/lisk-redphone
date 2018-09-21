@@ -1,65 +1,71 @@
-const axios = require('axios');
+import {
+  checkForgingIsEnabled,
+  hasForgedRecently,
+  isAtLeastOneForging,
+  isCheckListProperlyFilled } from './utils/checker'
+import { makeCall } from "./utils/caller";
+import { NodeApiNotReachable } from "./utils/errors";
+const got = require('got');
+const pMap = require('p-map');
 const config = require('config');
 const Repeat = require('repeat');
-const log = require('./utils/log')('lisk-redphone');
+const log = require('./utils/log')('lisk-redphone:main');
 
-let lastNotification = 0;
-const cooldown = config.get('cooldownInMinutes');
-const port =  config.get('isTestnet') ? 7000 : 8000;
-
-const isCooldown = () => {
-  if (lastNotification + 1000*60*cooldown > Date.now() ) {
-    log.debug('Cooldown activated. Wait before a new call.');
-    return true;
+class NodeApiResult {
+  constructor(url, restResult) {
+    this.url = url;
+    this.restResult = restResult;
   }
-  return false;
-};
 
-const makeCall = async () => {
+  isForgingEnabled() {
+    return checkForgingIsEnabled(this.restResult);
+  }
+}
 
-  const accountSid = config.get('twilio.accountSid');
-  const authToken = config.get('twilio.authToken');
-  const client = require('twilio')(accountSid, authToken);
-  await client.calls
-    .create({
-      url: 'http://demo.twilio.com/docs/voice.xml',
-      to: config.get('call.to'),
-      from: config.get('call.from')
-    })
-    .then(call => log.debug('Call SID: ' + call.sid));
-};
-
-const redPhoneCall = async () => {
-  if(isCooldown()) return;
-  log.debug('Not Forging. RED ALARM. Making the call.');
-  await makeCall();
-  lastNotification = Date.now();
-  return true;
-};
-
-let apiDownCounter = 0;
-const check = async () => {
+const urlForgingResolver = async baseUrl => {
   try {
-    const { data } = await axios.get('http://localhost:' + port + '/api/node/status/forging');
-    apiDownCounter = 0;
-    if ( !data || // No result from API
-         (data && data.data && data.data.length === 0 ) || // No delegate set-up in config.json
-         (data && data.data && data.data.length === 1 && data.data[0].forging === false) // Forging is disabled
-    ) {
-      await redPhoneCall();
-      return;
-    }
-    log.debug('Everything is fine.');
+    const { body } = await got('/api/node/status/forging', { baseUrl, json: true } );
+    return new NodeApiResult(baseUrl, body);
   } catch (e) {
-    log.debug('Node is not reachable.');
-    if(isCooldown()) return;
-    if(apiDownCounter <= 2) { // In case of restarts it gives max 3 mins to lisk node to recover
-      apiDownCounter++;
-      log.debug('Node is not reachable. Attempt: ' + apiDownCounter);
-      return;
+    return new NodeApiNotReachable(baseUrl, e.statusCode, e.statusMessage);
+  }
+};
+
+const checkList = config.get('checkList');
+if(!isCheckListProperlyFilled(checkList)) {
+  process.exit(0);
+}
+
+
+
+const doJob = async () => {
+
+  for (let i=0; i  <checkList.length; i++) {
+    const checkItem = checkList[i];
+
+    //Check if in the last 35 min the specified delegate has forged at least 1 block
+    try {
+      if(!hasForgedRecently(checkItem)) {
+        log.debug(`No block forged in the last 30 min for ${checkItem.label}`);
+        await makeCall();
+        continue;
+      }
+    } catch (e) {
+      // It happens only when the official endpoint is down... should be temporary.
+      log.error(`Error during check forged block in the last 30 min for ${checkItem.label}... Let's continue...`);
     }
-    await redPhoneCall();
-    return;
+
+    // Now Check all the nodes if at least one ha forging enabled
+    try {
+      const results = await pMap(checkItem.nodes, urlForgingResolver, {concurrency: 2});
+      const callOnDoubleForging = checkItem.hasOwnProperty('callOnDoubleForging') ? checkItem.callOnDoubleForging : false;
+      if(!await isAtLeastOneForging(results, callOnDoubleForging)) {
+        log.debug(`No node is forging for ${checkItem.label}!!1!`);
+        await makeCall();
+      }
+    } catch(e) {
+      throw new Error('Error during check job. ' + e.message );
+    }
   }
 };
 
@@ -70,10 +76,11 @@ const onFailure = (ex) => {
   log.error("Exception: ", ex);
 };
 
-log.debug('Starting Repeater...');
+log.debug('Configuration is ok. Starting Repeater...');
 Repeat( function() {
-  check();
+  doJob();
 })
 .every(config.get('checkFrequencyInMinutes'), 'min')
 .start()
 .then(onSuccess, onFailure, onProgress);
+log.debug('RedPhone is active. I hope I will not call you... ;)');

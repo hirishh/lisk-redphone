@@ -6,6 +6,7 @@
   "scripts": {
     "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log,./public --copy-files",
     "start": "npm run build && node dist/index.js",
+    "test-call": "npm run build && node dist/test-call.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,11 +20,13 @@
   },
   "homepage": "https://github.com/hirishh/lisk-redline#readme",
   "dependencies": {
-    "axios": "^0.18.0",
     "config": "^2.0.1",
     "debug": "^4.0.1",
+    "got": "^9.2.2",
+    "p-map": "^2.0.0",
     "repeat": "0.0.6",
-    "twilio": "^3.19.2"
+    "twilio": "^3.19.2",
+    "url-search-params": "^1.1.0"
   },
   "devDependencies": {
     "babel-cli": "^7.0.0-beta.3",

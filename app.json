@@ -1,7 +1,7 @@
 [
   {
     "name"              : "lisk-redphone",
-    "script"            : "index.js",
+    "script"            : "dist/index.js",
     "log_date_format"   : "YYYY-MM-DD HH:mm Z",
     "merge_logs"        : false,
     "watch"             : false,
