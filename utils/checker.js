@@ -61,6 +61,9 @@ export const hasForgedRecently = async (checkItem) => {
   return body && body.data && parseInt(body.data.count) !== 0;
 };
 
+const isValidAddress = address => {
+  return address.length > 2 && address.length < 22 && address[address.length - 1] === 'L';
+};
 
 export const isCheckListProperlyFilled = (checkList) => {
   for (let i=0; i  <checkList.length; i++) {
@@ -70,8 +73,8 @@ export const isCheckListProperlyFilled = (checkList) => {
       log.error(`Label property is missing on checkList at position: ${i+1}.`);
       return false;
     }
-    if (!checkItem.hasOwnProperty('delegateAddress')|| (checkItem.hasOwnProperty('delegateAddress') && checkItem.delegateAddress === "")) {
-      log.error(`Delegate address is missing for ${checkItem.label}`);
+    if (!checkItem.hasOwnProperty('delegateAddress')|| (checkItem.hasOwnProperty('delegateAddress') && !isValidAddress(checkItem.delegateAddress))) {
+      log.error(`Delegate address format is wrong for ${checkItem.label}: ${checkItem.delegateAddress}`);
       return false;
     }
     if (!checkItem.hasOwnProperty('isMainnet')) {

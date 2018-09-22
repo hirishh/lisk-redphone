@@ -45,14 +45,15 @@ const doJob = async () => {
 
     //Check if in the last 35 min the specified delegate has forged at least 1 block
     try {
-      if(!hasForgedRecently(checkItem)) {
+      if(!await hasForgedRecently(checkItem)) {
         log.debug(`No block forged in the last 30 min for ${checkItem.label}`);
         await makeCall();
         continue;
       }
     } catch (e) {
       // It happens only when the official endpoint is down... should be temporary.
-      log.error(`Error during check forged block in the last 30 min for ${checkItem.label}... Let's continue...`);
+      log.error(`Error during check forged block in the last 40 min for ${checkItem.label} and delegate address ${checkItem.delegateAddress}.`);
+      log.error(`Please check your delegate address is correct in the config. Let's continue with node checks...`);
     }
 
     // Now Check all the nodes if at least one ha forging enabled
