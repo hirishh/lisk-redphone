@@ -1,4 +1,5 @@
 {
+  "dry-run": false,
   "twilio": {
     "accountSid": "<ACCOUNT SID>",
     "authToken": "<AUTH TOKEN>"
@@ -9,5 +10,19 @@
   },
   "checkFrequencyInMinutes": 1,
   "cooldownInMinutes": 15,
-  "isTestnet": false
+  "checkList": [
+    {
+      "label": "<LABEL FOR THIS CHECK: ex. Lisk Testnet>",
+      "delegateAddress": "<YOUT DELEGATE ADDRESS>",
+      "isMainnet": false,
+      "nodes": ["http://localhost:7000"]
+    },
+    {
+      "label": "<LABEL FOR THIS CHECK: ex. Lisk Mainnet Cluster>",
+      "delegateAddress": "<YOUT DELEGATE USERNAME>",
+      "isMainnet": true,
+      "callOnDoubleForging": true,
+      "nodes": ["https://10.10.10.10:443", "http://11.12.13.14:8000"]
+    }
+  ]
 }

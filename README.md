@@ -2,6 +2,11 @@
 
 Lisk Red Phone is an utility for Lisk Delegates that makes real phone call when the forging node is not forging anymore.
 
+This tool is checking:
+- Your delegate has forged at least 1 block in the last 40 minutes
+- In all the specified nodes, at least one has forging enabled.
+- Double Forging. In this case the call is executed only if specified in the config
+
 ### Pre-Requisite ###
 
 - [Install Node.js](https://nodejs.org/download/).
@@ -12,14 +17,30 @@ Lisk Red Phone is an utility for Lisk Delegates that makes real phone call when 
 
 ### Set-up ###
 
-This tools is monitoring `localhost`. It means **it must be deployed where the lisk node lives**.
-
 1. Clone this repository: `git clone https://github.com/hirishh/lisk-redphone.git`
 2. `cd lisk-redphone`
 3. `npm install`
-4. Set the required information on `config/default.json` (you find everything in your twilio account)
+4. Set the required information on `config/default.json`. Check the Config section in this readme.
+5. `npm run build`
+6. Run `DEBUG=lisk-redphone* npm start` to check everything is ok. Quit the software with CTRL+C.
+7. Finally run it with PM2: `pm2 start app.json`
+
+#### Some Advices:
+- Try and check if everything is working by setting `dry-run: true`. 
+In this way all the checks are executed but without doing any phone call.
+- If you want to test that the Twilio Api/Phone Call is working, simply run `DEBUG=lisk-redphone* npm run test-call`.
+
+NB: There is a billing process on twilio on every call, but at the moment they never asked me to pay (and it's maximum a couple of bucks).
+
+##### Very Important: make sure the ip of the machine running redphone is whitelisted on your nodes (under api and forging in your config.json)!
+
+### Config ###
+
+Before running your RedPhone alert you need to set-up the config file on `config/default.json`.
+
 ```json
 {
+  "dry-run": false,
   "twilio": {
     "accountSid": "<ACCOUNT SID>",
     "authToken": "<AUTH TOKEN>"
@@ -30,19 +51,52 @@ This tools is monitoring `localhost`. It means **it must be deployed where the l
   },
   "checkFrequencyInMinutes": 1,
   "cooldownInMinutes": 15,
-  "isTestnet": false
+  "checkList": [
+    {
+      "label": "<LABEL FOR THIS CHECK: ex. Lisk Testnet>",
+      "delegateAddress": "<YOUT DELEGATE ADDRESS>",
+      "isMainnet": false,
+      "nodes": ["http://localhost:7000"]
+    },
+    {
+      "label": "<LABEL FOR THIS CHECK: ex. Lisk Mainnet Cluster>",
+      "delegateAddress": "<YOUT DELEGATE ADDRESS>",
+      "isMainnet": true,
+      "callOnDoubleForging": true,
+      "nodes": ["http://10.10.10.10:8000", "http://11.12.13.14:8000"]
+    },
+    ...
+    ...
+    ...
+  ]
 }
 ```
-5. Run `npm start` or `DEBUG=lisk-redphone* npm start` if you want to see debug logs.
 
- 
+Legend:
+- `dry-run`: **(bool)** If true, the script will execute the checks but it avoids to do the real phone call. Useful for tests.
+- `twilio.*`: **(string)** Check your twilio dashboard for your SID and authToken.
+- `call.from`: **(string)** Your twilio telephone number. 
+- `call.to`: **(string)** Your mobile number. 
+- `checkFrequencyInMinutes`: **(int)** How often the script must check that everything is ok. 
+- `cooldownInMinutes`: **(int)** The minimum time between 2 consecutive calls. 
+- `checkList`: **(object)** A list of node (or group of nodes) you want to check.
+    - `label`: **(string)** A label to easly identify the nature of the node(s) (ex. testnet, mainnet, etc..)
+    - `delegateAddress`: **(string)** The delegate address. It's used to check if there are forged blocks in the last 40 min. 
+    - `isMainnet`: **(bool)** specify if this specific check is on Lisk Mainnet or not (Testnet). 
+    - `callOnDoubleForging`: **(string)** (optional) if true, it will call you also in case of double forging (2+ nodes with forging enabled). 
+    - `nodes`: **(array of string)** A list of urls of your nodes (active + fail-overs one for example).
+    
+If you specify multiple `nodes`, the script is going to check that **at least one** has forging enabled
+
+##### Very Important: make sure the ip of the machine running redphone is whitelisted on your nodes (under api and forging in your config.json)!
+
 ### Run with PM2 ###
 
-Prerequisites: you are done with the first 4 steps of Set-up process.
+Prerequisites: you are done with the first 5 steps of Set-up process.
 
 Starting
 ```
-pm2 start app.json --watch
+pm2 start app.json
 ```
 
 Checking logs
