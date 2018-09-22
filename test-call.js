@@ -14,6 +14,10 @@ const makeCall = async () => {
     })
     .then(call => {
       log.debug('Call SID: ' + call.sid);
+    })
+    .catch((e) => {
+      log.debug('Error during making the call! Error message: ' + e.message);
+      console.info(e);
     });
 };
 
