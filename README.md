@@ -9,7 +9,7 @@ This tool is checking:
 
 ### Pre-Requisite ###
 
-- [Install Node.js](https://nodejs.org/download/).
+- [Install Node.js V8 or above](https://nodejs.org/download/).
 - Create a Twilio Account at [www.twilio.com](https://www.twilio.com/).
 - Create a `Phone Number` project (under Products section)
 - On the project dashboard, click on `Get a Number` and create a new Twilio Number

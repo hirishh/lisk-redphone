@@ -5,7 +5,7 @@ import {
   isCheckListProperlyFilled } from './utils/checker'
 import { makeCall } from "./utils/caller";
 import { NodeApiNotReachable } from "./utils/errors";
-const got = require('got');
+const rp = require('request-promise-native');
 const pMap = require('p-map');
 const config = require('config');
 const Repeat = require('repeat');
@@ -24,8 +24,8 @@ class NodeApiResult {
 
 const urlForgingResolver = async baseUrl => {
   try {
-    const { body } = await got('/api/node/status/forging', { baseUrl, json: true } );
-    return new NodeApiResult(baseUrl, body);
+    const reqBody = await rp('/api/node/status/forging', { baseUrl, json: true, rejectUnauthorized: false } );
+    return new NodeApiResult(baseUrl, reqBody);
   } catch (e) {
     return new NodeApiNotReachable(baseUrl, e.statusCode, e.statusMessage);
   }
