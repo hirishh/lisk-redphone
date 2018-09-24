@@ -23,7 +23,7 @@ export const isAtLeastOneForging = async (results, callOnDoubleForging) => {
     const res = results[i];
 
     if(res instanceof Error) {
-      log.debug(`Node ${res.url} is not reachable. StatusCode: ${res.statusCode}. StatusMessage: ${res.statusMessage}`);
+      log.debug(`Node ${res.url} is not reachable. ${res.errorMessage}`);
       continue;
     }
 
