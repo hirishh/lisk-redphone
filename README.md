@@ -23,10 +23,13 @@ This tool is checking:
 4. Set the required information on `config/default.json`. Check the Config section in this readme.
 5. `npm run build`
 6. Run `DEBUG=lisk-redphone* npm start` to check everything is ok. Quit the software with CTRL+C.
-7. Finally run it with PM2: `pm2 start app.json`
+7. To test the call, run `DEBUG=lisk-redphone* npm run test-call`. It will help you to configure twilio in case of errors.
+8. Install pm2 if not installed: `sudo npm i -g pm2`
+9. Finally run it with PM2: `pm2 start app.json`
+10. For the automatic startup, follow "Automatic startup with PM2" section.
 
 #### Some Advices:
-- Try and check if everything is working by setting `dry-run: true`. 
+- Try and check if everything is working by setting `dry-run: true` on your config. 
 In this way all the checks are executed but without doing any phone call.
 - If you want to test that the Twilio Api/Phone Call is working, simply run `DEBUG=lisk-redphone* npm run test-call`.
 
@@ -92,7 +95,7 @@ If you specify multiple `nodes`, the script is going to check that **at least on
 
 ### Run with PM2 ###
 
-Prerequisites: you are done with the first 5 steps of Set-up process.
+Prerequisites: you are done with the first 5 steps of Set-up process and you have pm2 installed (`sudo npm i -g pm2`)
 
 Starting
 ```
@@ -108,6 +111,20 @@ Stopping
 ```
 pm2 stop lisk-redphone
 ```
+
+### Update the software ###
+
+In order to update the Lisk Redphone, follow these intructions:
+
+1. Save your config (`config/default.json`) somewhere outside Lisk Redphone folder.
+3. `git reset --hard HEAD`
+4. `git pull`
+5. Re-configure again the configuration. NB: it's better to avoid to copy-paste the old configuration. Re-fill the information manually.
+6. `npm install`
+7. `npm run build`
+8. (optional) Check again everything is working with `dry-run:true` and following points 6 and 7 of the Set-up quide
+9. `pm2 restart lisk-redphone`
+
 
 ### Automatic startup with PM2 ###
 
@@ -125,7 +142,7 @@ Now follow the instruction. For example on ubuntu 14.04 LTE (with systemd as def
 sudo env PATH=$PATH:/usr/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u [user] --hp /home/[user]
 ```
 
-Copy-paste the last command. Now, *if you didn't before*, run the application with ```pm2 start app.json --watch``` and then:
+Copy-paste the command that PM2 is suggesting (sudo env PATH...). Now, *if you didn't before*, run the application with ```pm2 start app.json``` and then:
 ```
 pm2 save
 ```
