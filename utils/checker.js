@@ -1,6 +1,5 @@
 import { makeCall } from "./caller";
-const got = require('got');
-const URLSearchParams = require('url-search-params');
+const rp = require('request-promise-native');
 const log = require('./log')('lisk-redphone:checker');
 
 export const checkForgingIsEnabled = (apiCallRes) => {
@@ -48,17 +47,17 @@ const mainnetUrl = 'https://node06.lisk.io:443';
 const testnetUrl = 'https://testnet.lisk.io:443';
 
 export const hasForgedRecently = async (checkItem) => {
-  const params = new URLSearchParams({
+  const params = {
     toTimestamp: Date.now(),
     fromTimestamp: Date.now() - 1000*60*40
-  });
-  const { body } = await got(`/api/delegates/${checkItem.delegateAddress}/forging_statistics`,
+  };
+  const reqBody = await rp(`/api/delegates/${checkItem.delegateAddress}/forging_statistics`,
     {
       json: true,
       baseUrl: checkItem.isMainnet ? mainnetUrl : testnetUrl,
-      query: params
+      qs: params
     });
-  return body && body.data && parseInt(body.data.count) !== 0;
+  return reqBody && reqBody.data && parseInt(reqBody.data.count) !== 0;
 };
 
 const isValidAddress = address => {

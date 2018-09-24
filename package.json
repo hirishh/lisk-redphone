@@ -22,11 +22,11 @@
   "dependencies": {
     "config": "^2.0.1",
     "debug": "^4.0.1",
-    "got": "^9.2.2",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.5",
     "p-map": "^2.0.0",
     "repeat": "0.0.6",
-    "twilio": "^3.19.2",
-    "url-search-params": "^1.1.0"
+    "twilio": "^3.19.2"
   },
   "devDependencies": {
     "babel-cli": "^7.0.0-beta.3",
