@@ -4,6 +4,7 @@ const log = require('./log')('lisk-redphone:caller');
 const cooldown = config.get('cooldownInMinutes');
 const dryrun = config.get('dry-run');
 let lastNotification = 0;
+let retry = false;
 
 const isDryRun = () => {
   if ( dryrun ) {
@@ -21,9 +22,19 @@ const isCooldown = () => {
   return false;
 };
 
+const isRetry = () => {
+  if (!retry) {
+    log.debug('RED ALARM. First occurrence. If it happens again I am going to call you!.');
+    retry = !retry;
+    return true;
+  }
+  return false;
+};
+
 export const makeCall = async () => {
-    if(isDryRun()) return;
     if(isCooldown()) return;
+    if(isRetry()) return;
+    if(isDryRun()) return;
     log.debug('RED ALARM. Making the call.');
     const accountSid = config.get('twilio.accountSid');
     const authToken = config.get('twilio.authToken');
@@ -37,6 +48,7 @@ export const makeCall = async () => {
         .then(call => {
           log.debug('Call SID: ' + call.sid);
           lastNotification = Date.now();
+          retry = false;
         })
        .catch(e => {
          log.debug('Error during making the call! Error message: ' + e.message);
